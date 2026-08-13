@@ -1,0 +1,158 @@
+{
+  "schema_version": "0.1",
+  "session": {
+    "id": "session_20260814_001_demo",
+    "schema_version": "0.1",
+    "application_version": "0.1.0",
+    "tracking_library": "@mediapipe/tasks-vision 0.10.14",
+    "experiment_name": "surface_typing",
+    "participant_id": "P001",
+    "hand_tested": "right",
+    "created_timestamp_iso": "2026-08-14T04:25:00.000Z",
+    "start_perf_timestamp": 12045.12,
+    "end_perf_timestamp": 16045.12,
+    "screen_resolution": {
+      "width": 1920,
+      "height": 1080
+    },
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "notes": "Prototype 0 baseline pilot dataset"
+  },
+  "trials": [
+    {
+      "trial_id": "trial_1_a9f2",
+      "trial_number": 1,
+      "name": "Index Finger Surface Tap (Rep 1/5)",
+      "instructions": "Place hand naturally on surface. Tap with index finger, then release.",
+      "intended_action": "index_finger_tap",
+      "expected_output": "KeyA",
+      "start_timestamp": 12500.0,
+      "start_relative_ms": 454.88,
+      "end_timestamp": 14200.0,
+      "end_relative_ms": 2154.88,
+      "completed": true,
+      "notes": "Clean contact"
+    }
+  ],
+  "sensor_data": [
+    {
+      "id": "cam_1723610001_a1",
+      "timestamp": 12516.6,
+      "relative_timestamp_ms": 471.48,
+      "source": "camera",
+      "type": "hand_landmark",
+      "frame_index": 1,
+      "hand": "Right",
+      "confidence": 0.98,
+      "landmarks": [
+        {
+          "index": 0,
+          "name": "wrist",
+          "normalized": { "x": 0.52, "y": 0.75, "z": 0.0 },
+          "world": { "x": -0.01, "y": 0.12, "z": 0.35 },
+          "wrist_relative": { "x": 0.0, "y": 0.0, "z": 0.0 }
+        },
+        {
+          "index": 8,
+          "name": "index_tip",
+          "normalized": { "x": 0.48, "y": 0.42, "z": -0.05 },
+          "world": { "x": -0.04, "y": -0.08, "z": 0.28 },
+          "wrist_relative": { "x": -0.03, "y": -0.2, "z": -0.07 }
+        }
+      ],
+      "derived_geometry": {
+        "hand": "Right",
+        "joint_angles": {
+          "thumb": { "cmc_deg": 142, "mcp_deg": 165, "ip_deg": 170 },
+          "index": { "mcp_deg": 160, "pip_deg": 135, "dip_deg": 155 },
+          "middle": { "mcp_deg": 168, "pip_deg": 160, "dip_deg": 165 },
+          "ring": { "mcp_deg": 170, "pip_deg": 162, "dip_deg": 168 },
+          "little": { "mcp_deg": 165, "pip_deg": 158, "dip_deg": 160 }
+        },
+        "flexion": {
+          "thumb_pct": 12,
+          "index_pct": 32,
+          "middle_pct": 12,
+          "ring_pct": 10,
+          "little_pct": 14
+        },
+        "fingertip_distances": {
+          "thumb_to_index": 0.085,
+          "thumb_to_middle": 0.12,
+          "thumb_to_ring": 0.145,
+          "thumb_to_little": 0.165,
+          "index_to_middle": 0.035,
+          "middle_to_ring": 0.032,
+          "ring_to_little": 0.038
+        },
+        "wrist_to_tip_distances": {
+          "thumb_tip": 0.14,
+          "index_tip": 0.205,
+          "middle_tip": 0.22,
+          "ring_tip": 0.21,
+          "little_tip": 0.175
+        },
+        "kinematics": {
+          "velocity": { "index": { "x": 0.02, "y": -0.35, "z": 0.01 } },
+          "speed": { "index": 0.35 },
+          "acceleration": { "index": { "x": 0.0, "y": -1.2, "z": 0.0 } }
+        },
+        "orientation": {
+          "pitch_deg": 12,
+          "yaw_deg": -4,
+          "roll_deg": 2,
+          "palm_normal": { "x": 0.05, "y": 0.98, "z": -0.15 }
+        },
+        "palm_dimensions": {
+          "width": 0.082,
+          "length": 0.095
+        }
+      }
+    },
+    {
+      "id": "kbd_1723610002_k1",
+      "timestamp": 12610.5,
+      "relative_timestamp_ms": 565.38,
+      "source": "keyboard",
+      "type": "keydown",
+      "key": "a",
+      "code": "KeyA",
+      "modifiers": {
+        "shift": false,
+        "ctrl": false,
+        "alt": false,
+        "meta": false,
+        "capsLock": false
+      },
+      "repeat": false
+    },
+    {
+      "id": "kbd_1723610003_k2",
+      "timestamp": 12695.2,
+      "relative_timestamp_ms": 650.08,
+      "source": "keyboard",
+      "type": "keyup",
+      "key": "a",
+      "code": "KeyA",
+      "modifiers": {
+        "shift": false,
+        "ctrl": false,
+        "alt": false,
+        "meta": false,
+        "capsLock": false
+      },
+      "repeat": false
+    }
+  ],
+  "human_intended_output": [
+    {
+      "id": "intent_1723610001_i1",
+      "timestamp": 12500.0,
+      "relative_timestamp_ms": 454.88,
+      "trial_id": "trial_1_a9f2",
+      "intended_action": "index_finger_tap",
+      "expected_output": "KeyA",
+      "notes": "Trial #1 started: Index Finger Surface Tap (Rep 1/5)"
+    }
+  ]
+}

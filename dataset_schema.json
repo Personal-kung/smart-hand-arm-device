@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GloveKeyboardDatasetSession",
+  "type": "object",
+  "required": ["schema_version", "session", "trials", "sensor_data", "human_intended_output"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["0.1"]
+    },
+    "session": {
+      "type": "object",
+      "required": [
+        "id",
+        "schema_version",
+        "application_version",
+        "tracking_library",
+        "experiment_name",
+        "participant_id",
+        "hand_tested",
+        "created_timestamp_iso",
+        "start_perf_timestamp"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "schema_version": { "type": "string" },
+        "application_version": { "type": "string" },
+        "tracking_library": { "type": "string" },
+        "experiment_name": { "type": "string" },
+        "participant_id": { "type": "string" },
+        "hand_tested": { "type": "string", "enum": ["left", "right", "both"] },
+        "created_timestamp_iso": { "type": "string" },
+        "start_perf_timestamp": { "type": "number" },
+        "end_perf_timestamp": { "type": "number" },
+        "screen_resolution": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "integer" },
+            "height": { "type": "integer" }
+          }
+        },
+        "user_agent": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "trials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["trial_id", "trial_number", "name", "instructions", "intended_action", "start_timestamp", "start_relative_ms"],
+        "properties": {
+          "trial_id": { "type": "string" },
+          "trial_number": { "type": "integer" },
+          "name": { "type": "string" },
+          "instructions": { "type": "string" },
+          "intended_action": { "type": "string" },
+          "expected_output": { "type": "string" },
+          "start_timestamp": { "type": "number" },
+          "start_relative_ms": { "type": "number" },
+          "end_timestamp": { "type": "number" },
+          "end_relative_ms": { "type": "number" },
+          "completed": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "sensor_data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "timestamp", "relative_timestamp_ms", "source", "type"],
+        "properties": {
+          "id": { "type": "string" },
+          "timestamp": { "type": "number" },
+          "relative_timestamp_ms": { "type": "number" },
+          "source": {
+            "type": "string",
+            "enum": ["camera", "keyboard", "imu", "flex", "strain", "contact", "vibration", "proximity", "future_sensor"]
+          },
+          "type": { "type": "string" },
+          "frame_index": { "type": "integer" },
+          "hand": { "type": "string", "enum": ["Left", "Right"] },
+          "confidence": { "type": "number" },
+          "key": { "type": "string" },
+          "code": { "type": "string" },
+          "modifiers": { "type": "object" },
+          "repeat": { "type": "boolean" },
+          "sensor_id": { "type": "string" },
+          "raw_value": {},
+          "calibrated_value": {}
+        }
+      }
+    },
+    "human_intended_output": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "timestamp", "relative_timestamp_ms", "intended_action"],
+        "properties": {
+          "id": { "type": "string" },
+          "timestamp": { "type": "number" },
+          "relative_timestamp_ms": { "type": "number" },
+          "trial_id": { "type": "string" },
+          "intended_action": { "type": "string" },
+          "expected_output": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}
