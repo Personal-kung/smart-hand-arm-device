@@ -15,6 +15,7 @@ import { ExperimentPanel } from './components/ExperimentPanel';
 import { DataPanel } from './components/DataPanel';
 import { TimelineView } from './components/TimelineView';
 import { ReplayModal } from './components/ReplayModal';
+import { HandModel3D } from './components/HandModel3D';
 
 export const App: React.FC = () => {
   // Singleton Services
@@ -83,7 +84,7 @@ export const App: React.FC = () => {
           onCameraStateChange={setIsCameraActive}
         />
 
-        <HandDataPanel handResults={handResults} />
+        <HandModel3D handResults={handResults} />
 
         {/* Row 2: Physical Keyboard Panel + Recording Engine */}
         <KeyboardPanel

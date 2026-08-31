@@ -33,6 +33,12 @@ export const DataPanel: React.FC<DataPanelProps> = ({
     }
   };
 
+  // Example button click handler for your UI component
+  const handleExportMLTraining = () => {
+    const currentSession = recorderService.getSession();
+    ExporterService.exportMLTrainingCSV(currentSession);
+  };
+
   const handleImportFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -87,6 +93,12 @@ export const DataPanel: React.FC<DataPanelProps> = ({
         <button className="btn" onClick={handleExportCSV} style={{ flex: 1 }}>
           <FileSpreadsheet size={16} />
           <span>Export Sensor CSV</span>
+        </button>
+
+        {/* Added ML Training Pairs Export Button */}
+        <button className="btn" onClick={handleExportMLTraining} style={{ flex: 1, background: '#0284c7', borderColor: '#0369a1', color: '#fff' }}>
+          <FileSpreadsheet size={16} />
+          <span>Export ML Training CSV</span>
         </button>
 
         <button className="btn" onClick={() => fileInputRef.current?.click()} style={{ flex: 1 }}>

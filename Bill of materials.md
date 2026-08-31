@@ -105,3 +105,61 @@ Since you are in Iizuka, you are near **Kyushu Institute of Technology (Kyutech)
 4. **Day 8-21:** Continuous wear and data logging to the SD card.
 
 **Engineering Question:** Since you'll be in Iizuka, are you planning to use the **ESP32’s ESP-NOW** protocol for low-latency wireless data to your laptop, or stick to standard **BLE (Bluetooth Low Energy)** for easier mobile integration?
+
+
+# Prototype 0 — Minimum Hardware Purchase List (pending to buy)
+
+### Sensors and electronics
+
+|    Qty | Component                               | Prototype 0 purpose                                | Placement                         |
+| -----: | --------------------------------------- | -------------------------------------------------- | --------------------------------- |
+|  **1** | **ESP32-S3-DevKitC-1-N8R8**             | Main sensor acquisition + USB communication        | Forearm                           |
+|  **5** | **2.2" resistive flex sensors**         | Overall curvature/flexion of each finger           | Dorsal side, one/finger           |
+|  **5** | **FSR force sensors**                   | Indirect tap/contact/mechanical reaction detection | Dorsal distal linkage, one/finger |
+|  **1** | **MPU-6050 6-axis IMU breakout**        | Hand acceleration + angular velocity               | Dorsal hand                       |
+|  **1** | **Rotary angle sensor/potentiometer**   | Experimental reference angle measurement           | **Index PIP**                     |
+|  **1** | **3 V coin/mini vibration motor**       | Wrist haptic feedback                              | Wrist                             |
+|  **1** | **Logic-level N-MOSFET**                | Safe PWM switching of vibration motor              | Forearm electronics               |
+|  **1** | **Flyback diode** (1N4148/1N5819 class) | Motor transient protection                         | Across motor                      |
+| **10** | **10 kΩ resistors**                     | Flex/FSR voltage dividers + spare                  | Electronics                       |
+|  **5** | **0.1 µF ceramic capacitors**           | ADC noise filtering                                | Analog inputs                     |
+
+The ESP32-S3 has 20 ADC-capable channels in its architecture, so five flex + five FSR analog channels are comfortably within the controller's capability. Espressif also recommends ADC filtering/calibration for improved measurement quality. ([Espressif Systems][2])
+
+### Wiring/connectors
+
+|        Qty | Component                                           | Purpose                      |
+| ---------: | --------------------------------------------------- | ---------------------------- |
+| **1 roll** | **28 AWG stranded silicone wire**                   | Sensor signal wiring         |
+| **1 roll** | **26 AWG stranded silicone wire**                   | Power/ground/motor           |
+|  **1 set** | **JST-PH 2.0 mm 2/3/4-pin connectors**              | Detachable finger modules    |
+|  **1 set** | **Dupont jumper wires**                             | Breadboard/prototyping       |
+|      **1** | **USB-C data cable** compatible with ESP32-S3 board | ESP32 ↔ computer             |
+|      **1** | **Breadboard**                                      | Initial electrical prototype |
+
+### Mechanical essentials
+
+These aren't sensors, but you need them to actually mount the system:
+
+|        Qty | Component                               | Purpose                 |
+| ---------: | --------------------------------------- | ----------------------- |
+| **1 roll** | **20–25 mm Velcro/Hook-and-loop strap** | Hand/wrist attachment   |
+| **1 roll** | **Thin elastic/Velcro finger straps**   | Hold sensor linkages    |
+| **1 pack** | **Small M2/M3 screws, nuts, washers**   | Goniometer construction |
+| **1 pack** | **Heat-shrink tubing**                  | Wire strain relief      |
+| **1 roll** | **Flexible braided cable sleeve**       | Dorsal cable harness    |
+
+### Development tools
+
+Since you said you currently don't have these:
+
+|          Qty | Tool                                      | Why                               |
+| -----------: | ----------------------------------------- | --------------------------------- |
+|        **1** | **Digital multimeter**                    | Essential                         |
+|        **1** | **Temperature-controlled soldering iron** | Essential                         |
+|        **1** | **Solder + flux**                         | Essential                         |
+|        **1** | **Wire stripper/cutter**                  | Essential                         |
+|        **1** | **Small precision screwdriver set**       | Mechanical assembly               |
+|        **1** | **Small side cutters**                    | Wiring                            |
+| **Optional** | Logic analyzer                            | Useful later for timing/debugging |
+| **Optional** | 3D printer                                | Very useful for the dorsal frame  |

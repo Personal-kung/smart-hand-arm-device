@@ -183,7 +183,7 @@ export class RecorderService {
 
     this.activeTrial = trial;
     this.trialsBuffer.push(trial);
-    
+
     // Automatically log intention for start of trial
     this.logHumanIntention(intendedAction, expectedOutput, `Trial #${trialNumber} started: ${name}`);
     this.notifyState();
@@ -254,5 +254,20 @@ export class RecorderService {
 
   public getActiveTrial(): Trial | null {
     return this.activeTrial;
+  }
+
+  // Add this method inside your RecorderService class in src/services/recorder.ts:
+  public downloadSessionJSON(filename = `dataset_session_${this.sessionMetadata.id}.json`): void {
+    const sessionData = this.getSession();
+    const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 }

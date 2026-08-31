@@ -1,4 +1,5 @@
-import { DatasetSession } from '../types/dataset';
+//import { DatasetSession } from '../types/dataset';
+import { DatasetSession, CameraSensorDataPoint, KeyboardSensorDataPoint } from '../types/dataset';
 
 export class ExporterService {
   /**
@@ -110,5 +111,79 @@ export class ExporterService {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  public static exportMLTrainingCSV(datasetSession: DatasetSession, maxDeltaMs = 60, filename?: string): void {
+    const defaultFilename = `${datasetSession.session.id || 'session'}_ml_training_pairs.csv`;
+    const cameraPoints = datasetSession.sensor_data.filter((p): p is CameraSensorDataPoint => p.source === 'camera');
+    const keyboardPoints = datasetSession.sensor_data.filter((p): p is KeyboardSensorDataPoint => p.source === 'keyboard' && p.type === 'keydown');
+
+    if (keyboardPoints.length === 0) {
+      alert('No keyboard keydown events available for ML alignment.');
+      return;
+    }
+
+    const headers = [
+      'timestamp',
+      'relative_timestamp_ms',
+      'key',
+      'code',
+      // Left Hand features
+      'left_wrist_x', 'left_wrist_y', 'left_wrist_z',
+      'left_index_tip_x', 'left_index_tip_y', 'left_index_tip_z',
+      'left_flexion_index',
+      // Right Hand features
+      'right_wrist_x', 'right_wrist_y', 'right_wrist_z',
+      'right_index_tip_x', 'right_index_tip_y', 'right_index_tip_z',
+      'right_flexion_index',
+      'time_delta_ms'
+    ];
+
+    const csvLines: string[] = [headers.join(',')];
+
+    keyboardPoints.forEach(kbd => {
+      let nearestLeft: CameraSensorDataPoint | undefined;
+      let nearestRight: CameraSensorDataPoint | undefined;
+      let minDelta = Infinity;
+
+      // Find closest camera frame for this exact keydown timestamp
+      cameraPoints.forEach(cam => {
+        const delta = Math.abs(cam.timestamp - kbd.timestamp);
+        if (delta < minDelta && delta <= maxDeltaMs) {
+          minDelta = delta;
+          if (cam.hand === 'Left') nearestLeft = cam;
+          if (cam.hand === 'Right') nearestRight = cam;
+        }
+      });
+
+      const row = [
+        kbd.timestamp,
+        kbd.relative_timestamp_ms,
+        `"${kbd.key}"`,
+        `"${kbd.code}"`,
+        // Left Hand data extraction
+        nearestLeft?.landmarks[0]?.wrist_relative?.x || '',
+        nearestLeft?.landmarks[0]?.wrist_relative?.y || '',
+        nearestLeft?.landmarks[0]?.wrist_relative?.z || '',
+        nearestLeft?.landmarks[8]?.wrist_relative?.x || '',
+        nearestLeft?.landmarks[8]?.wrist_relative?.y || '',
+        nearestLeft?.landmarks[8]?.wrist_relative?.z || '',
+        nearestLeft?.derived_geometry?.flexion?.index_pct || '',
+        // Right Hand data extraction
+        nearestRight?.landmarks[0]?.wrist_relative?.x || '',
+        nearestRight?.landmarks[0]?.wrist_relative?.y || '',
+        nearestRight?.landmarks[0]?.wrist_relative?.z || '',
+        nearestRight?.landmarks[8]?.wrist_relative?.x || '',
+        nearestRight?.landmarks[8]?.wrist_relative?.y || '',
+        nearestRight?.landmarks[8]?.wrist_relative?.z || '',
+        nearestRight?.derived_geometry?.flexion?.index_pct || '',
+        minDelta === Infinity ? -1 : minDelta
+      ];
+
+      csvLines.push(row.join(','));
+    });
+
+    const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    this.triggerDownload(blob, filename || defaultFilename);
   }
 }

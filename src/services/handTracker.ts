@@ -23,7 +23,7 @@ export class HandTrackerService {
       this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
-          delegate: 'GPU'
+          delegate: 'GPU' //" Use 'GPU' if you want to leverage GPU acceleration"
         },
         runningMode: 'VIDEO',
         numHands: 2,
@@ -44,16 +44,17 @@ export class HandTrackerService {
 
   public detectVideoFrame(videoElement: HTMLVideoElement): HandTrackingResult[] {
     if (!this.handLandmarker || !this.isInitialized) return [];
-    if (videoElement.currentTime === this.lastVideoTime) {
+    if (videoElement.currentTime === this.lastVideoTime || videoElement.paused || videoElement.ended) {
       return [];
     }
     this.lastVideoTime = videoElement.currentTime;
 
-    const timestamp = TimestampService.now();
+    // Use performance.now() or ensure millisecond integer conversion strictly increasing
+    const timestamp = performance.now();
     const results: HandTrackingResult[] = [];
 
     try {
-      const mpResult = this.handLandmarker.detectForVideo(videoElement, timestamp);
+      const mpResult = this.handLandmarker.detectForVideo(videoElement, timestamp);      
 
       if (mpResult && mpResult.landmarks && mpResult.landmarks.length > 0) {
         for (let i = 0; i < mpResult.landmarks.length; i++) {
@@ -67,9 +68,9 @@ export class HandTrackerService {
             ? mpResult.worldLandmarks[i].map(lm => ({ x: lm.x, y: lm.y, z: lm.z }))
             : undefined;
 
-          // Handedness string label (Left or Right)
+          // Handedness string label (Left or Right)          
           const handednessCategory = mpResult.handednesses[i]?.[0];
-          const handedness: Handedness = handednessCategory?.categoryName === 'Left' ? 'Left' : 'Right';
+          const handedness: Handedness = handednessCategory?.categoryName === 'Left' ? 'Right' : 'Left';
           const score = handednessCategory?.score || 0.9;
 
           // Derive wrist-relative landmarks and hand geometry features

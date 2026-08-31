@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Camera, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { CameraService, CameraDevice } from '../services/camera';
 import { HandTrackerService } from '../services/handTracker';
-import { HandTrackingResult, HandLandmarketIndex, HandLandmarkIndex } from '../types/hand';
+import { HandTrackingResult, HandLandmarkIndex } from '../types/hand';
 
 interface CameraViewProps {
   cameraService: CameraService;
@@ -71,7 +71,6 @@ export const CameraView: React.FC<CameraViewProps> = ({
   const [currentFps, setCurrentFps] = useState<number>(0);
 
   useEffect(() => {
-    // Enumerate camera hardware
     cameraService.getAvailableCameras().then((devs) => {
       setCameras(devs);
       if (devs.length > 0) {
@@ -79,7 +78,6 @@ export const CameraView: React.FC<CameraViewProps> = ({
       }
     });
 
-    // Initialize MediaPipe model
     handTracker.initialize().catch((err) => {
       setTrackingError(`Hand Landmarker Init Error: ${err.message}`);
     });
@@ -130,7 +128,6 @@ export const CameraView: React.FC<CameraViewProps> = ({
             canvas.height = video.videoHeight;
           }
 
-          // Calculate Camera FPS
           frameCountRef.current++;
           const now = performance.now();
           if (now - lastFpsCalcTimeRef.current >= 1000) {
@@ -140,11 +137,10 @@ export const CameraView: React.FC<CameraViewProps> = ({
             lastFpsCalcTimeRef.current = now;
           }
 
-          // Run Hand Landmarker inference
+          // Detects up to 2 hands concurrently via HandTrackerService
           const results = handTracker.detectVideoFrame(video);
           onHandResults(results, currentFps);
 
-          // Draw Canvas Overlays
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -167,14 +163,19 @@ export const CameraView: React.FC<CameraViewProps> = ({
     mirrored: boolean
   ) => {
     results.forEach((res) => {
-      const isRight = res.handedness === 'Right';
+      // In a mirrored layout, MediaPipe's internal classification treats the feed as a selfie layout.
+      // We invert display assignment if mirrored so physical right hand matches screen right hand indicator.
+      const effectiveHandedness = mirrored 
+        ? (res.handedness === 'Right' ? 'Left' : 'Right') 
+        : res.handedness;
+
+      const isRight = effectiveHandedness === 'Right';
       const mainColor = isRight ? '#38bdf8' : '#a855f7'; // Cyan for Right, Purple for Left
 
-      // Convert normalized landmarks to canvas pixel coordinates
       const pxPoints = res.landmarks.map((lm) => {
         let x = lm.normalized.x * width;
         if (mirrored) {
-          x = width - x; // Mirror coordinate flip for display canvas
+          x = width - x;
         }
         const y = lm.normalized.y * height;
         return { x, y };
@@ -201,7 +202,6 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
         ctx.beginPath();
         if (isWrist) {
-          // Wrist Origin (Red Glowing Ring)
           ctx.arc(pt.x, pt.y, 9, 0, 2 * Math.PI);
           ctx.fillStyle = '#ef4444';
           ctx.fill();
@@ -209,7 +209,6 @@ export const CameraView: React.FC<CameraViewProps> = ({
           ctx.lineWidth = 2;
           ctx.stroke();
         } else if (isTip) {
-          // Fingertips (Glowing Yellow/Green Rings)
           ctx.arc(pt.x, pt.y, 7, 0, 2 * Math.PI);
           ctx.fillStyle = '#10b981';
           ctx.fill();
@@ -217,26 +216,25 @@ export const CameraView: React.FC<CameraViewProps> = ({
           ctx.lineWidth = 2;
           ctx.stroke();
         } else {
-          // Joints & Knuckles
           ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
           ctx.fillStyle = mainColor;
           ctx.fill();
         }
       });
 
-      // 3. Draw Handedness Label Tag at Wrist
+      // 3. Draw Dual Handedness Label Tag at Wrist (wristPt declared from pxPoints[0])
       const wristPt = pxPoints[0];
       if (wristPt) {
         ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-        ctx.fillRect(wristPt.x - 40, wristPt.y + 12, 80, 22);
+        ctx.fillRect(wristPt.x - 45, wristPt.y + 12, 90, 22);
         ctx.strokeStyle = mainColor;
         ctx.lineWidth = 1;
-        ctx.strokeRect(wristPt.x - 40, wristPt.y + 12, 80, 22);
+        ctx.strokeRect(wristPt.x - 45, wristPt.y + 12, 90, 22);
 
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`${res.handedness} (${Math.round(res.score * 100)}%)`, wristPt.x, wristPt.y + 27);
+        ctx.fillText(`${effectiveHandedness} (${Math.round(res.score * 100)}%)`, wristPt.x, wristPt.y + 27);
       }
     });
   };
@@ -246,7 +244,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
       <div className="panel-header">
         <div className="panel-title">
           <Camera size={18} />
-          <span>Camera & Skeleton View (21 Hand Landmarks)</span>
+          <span>Camera & Dual-Hand Skeleton View</span>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
@@ -285,7 +283,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
         {isCameraActive && (
           <div className="overlay-badge">
-            FPS: {currentFps} | {showSkeleton ? '21-pt Tracking' : 'Video Only'}
+            FPS: {currentFps} | Dual-Hand Tracking Active
           </div>
         )}
 
@@ -293,7 +291,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
           <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
             <Camera size={48} style={{ marginBottom: '12px', opacity: 0.4 }} />
             <div>Webcam Stream Inactive</div>
-            <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>Click "Start Camera" to begin real-time tracking</div>
+            <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>Click "Start Camera" to track both hands simultaneously</div>
           </div>
         )}
       </div>
